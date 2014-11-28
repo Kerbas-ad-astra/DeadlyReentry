@@ -99,7 +99,7 @@ namespace DeadlyReentry
 			}
 		}
 
-		[KSPField(isPersistant = false, guiActive = false, guiName = "Shockwave", guiUnits = "",   guiFormat = "G")]
+        [KSPField(isPersistant = false, guiActive = false, guiName = "Shockwave", guiUnits = "",   guiFormat = "G")]
 		public string displayShockwave;
 
 		[KSPField(isPersistant = false, guiActive = false, guiName = "Density", guiUnits = "",   guiFormat = "G")]
@@ -416,7 +416,7 @@ namespace DeadlyReentry
 	                        if (p.deploymentState == ModuleParachute.deploymentStates.DEPLOYED || p.deploymentState == ModuleParachute.deploymentStates.SEMIDEPLOYED)
 							{
 	                            p.CutParachute();
-                                FlightLogger.eventLog.Add("[" + FormatTime(vessel.missionTime) + "] " + part.partInfo.title + " chute failure! (too fast or too hot)");
+                                FlightLogger.eventLog.Add("[" + FormatTime(vessel.missionTime) + "] " + part.partInfo.title + " chute failure! (unsafe speed)");
                             }
 
 						}
@@ -425,7 +425,7 @@ namespace DeadlyReentry
 	                        if ((bool)rCType.GetProperty("anyDeployed").GetValue(realChute, null))
 							{
 	                            rCType.GetMethod("GUICut").Invoke(realChute, null);
-								FlightLogger.eventLog.Add("[" + FormatTime(vessel.missionTime) + "] " + part.partInfo.title + " chute failure! (too fast or too hot)");
+								FlightLogger.eventLog.Add("[" + FormatTime(vessel.missionTime) + "] " + part.partInfo.title + " chute failure! (unsafe speed)");
 							}
 	                    }
 					}
@@ -799,6 +799,23 @@ namespace DeadlyReentry
         public string techRequired = "";
 
         protected bool canShield = true;
+        
+        FXGroup _ablationShieldFX = null;
+        FXGroup ablationShieldFX 
+        {
+            get {
+                if(_ablationShieldFX == null) {
+                    _ablationShieldFX = new FXGroup (part.partName + "_Ablating");
+                    _ablationShieldFX.fxEmitters.Add(Emitter("fx_exhaustSparks_yellow").GetComponent<ParticleEmitter>());
+                    //_ablationShieldFX.audio = gameObject.AddComponent<AudioSource>();
+                    //_ablationShieldFX.audio.clip = GameDatabase.Instance.GetAudioClip("DeadlyReentry/Sounds/fire_damage");
+                    //_ablationShieldFX.audio.volume = GameSettings.SHIP_VOLUME;
+                    //_ablationShieldFX.audio.Stop ();
+                    
+                }
+                return _ablationShieldFX;
+            }
+        }
 
 		public void Start()
 		{
@@ -843,7 +860,24 @@ namespace DeadlyReentry
                                               * loss.Evaluate((float) Math.Pow (shockwave, ReentryPhysics.temperatureExponent)) 
                                               * AdjustedDensity()
 					                          * deltaTime);
-
+                    if (ablation > 1.0)
+                    {
+                        foreach (ParticleEmitter fx in ablationShieldFX.fxEmitters)
+                        {
+                            fx.gameObject.SetActive(true);
+                            fx.gameObject.transform.LookAt(part.transform.position + velocity);
+                            fx.gameObject.transform.Rotate(90, 0, 0);
+                        }
+                    }
+                    else
+                    {
+                        foreach (ParticleEmitter fx in ablationShieldFX.fxEmitters)
+                        {
+                            fx.gameObject.SetActive(false);
+                            fx.gameObject.transform.LookAt(part.transform.position + velocity);
+                            fx.gameObject.transform.Rotate(90, 0, 0);
+                        }
+                    }
                     float disAmount = dissipation.Evaluate(part.temperature) * ablation * (1 - damage) * (1 - damage);
                     if (disAmount > 0)
                     {
@@ -933,10 +967,13 @@ namespace DeadlyReentry
 		private static AerodynamicsFX _afx;
 
         public static AerodynamicsFX afx {
-			get {
-				if (_afx == null) {
+			get
+            {
+				if (_afx == null)
+                {
 					GameObject fx = GameObject.Find ("FXLogic");
-					if (fx != null) {
+					if (fx != null)
+                    {
 						_afx = fx.GetComponent<AerodynamicsFX> ();
 					}
 				}
@@ -1150,10 +1187,16 @@ namespace DeadlyReentry
             }
         }
 
-		IEnumerator FixAeroFX(AerodynamicsFX aeroFX)
-		{
+        public IEnumerator AeroFixer()
+        {
             yield return new WaitForFixedUpdate();
-            aeroFX.airDensity = (float)(Math.Pow(frameDensity, afxDensityExponent));
+            FixAeroFX();
+        }
+
+		//public void FixAeroFX(AerodynamicsFX aeroFX)
+        public void FixAeroFX()
+        {
+            afx.airDensity = (float)(Math.Pow(frameDensity, afxDensityExponent));
 			if (afx.velocity.magnitude < startThermal) // approximate speed where shockwaves begin visibly glowing
 				afx.state = 0;
 			else if (afx.velocity.magnitude >= fullThermal)
@@ -1175,14 +1218,14 @@ namespace DeadlyReentry
                 else
                     frameDensity = (float)FlightGlobals.ActiveVessel.atmDensity;
 			}
-            FixAeroFX(afx);
+            StartCoroutine(AeroFixer());
 		}
 
 		public void LateUpdate()
 		{
             if (!isCompatible)
                 return;
-			FixAeroFX (afx);
+            //FixAeroFX ();
 		}
 
         public void Update()
@@ -1198,7 +1241,7 @@ namespace DeadlyReentry
             {
                 if ((afx != null))
                 {
-					FixAeroFX(afx);
+                    //FixAeroFX();
 				
 					foreach (Vessel vessel in FlightGlobals.Vessels) 
 					{
