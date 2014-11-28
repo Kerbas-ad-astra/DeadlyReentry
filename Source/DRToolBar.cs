@@ -67,12 +67,11 @@ namespace DeadlyReentry
 			try 
 			{
 				RenderingManager.RemoveFromPostDrawQueue (0, OnDraw);
-			} 
+                RenderingManager.AddToPostDrawQueue (0, OnDraw);
+            } 
 			catch 
 			{
 			}
-			
-			RenderingManager.AddToPostDrawQueue (0, OnDraw);
 		}
 		
 		void OnGUIAppLauncherReady()
