@@ -1,9 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="DeadlyReentry.cs">
     <Files>
-      <File FileName="DeadlyReentry.cs" Line="879" Column="1" />
-      <File FileName="DRToolBar.cs" Line="79" Column="6" />
+      <File FileName="DeadlyReentry.cs" Line="26" Column="1" />
+      <File FileName="DRToolBar.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

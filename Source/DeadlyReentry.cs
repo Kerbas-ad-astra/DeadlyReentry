@@ -822,7 +822,7 @@ namespace DeadlyReentry
             base.Start();
 			if (ablative == null)
 				ablative = "None";
-
+            Debug.Log("ModuleHeatShield.Start()");
             part.heatConductivity = conductivity;
             if (ReentryPhysics.dissipationCap)
                 // key = 1350 3600.0 14.06186 0 - Maybe increase value higher...
