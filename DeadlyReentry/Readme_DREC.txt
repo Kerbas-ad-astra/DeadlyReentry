@@ -5,14 +5,12 @@ License remains CC-BY-SA as modified by ialdabaoth.
 Also included: Module Manager (by sarbian, swamp_ig, and ialdabaoth). See Module Manager thread for details and license and source: http://http://forum.kerbalspaceprogram.com/threads/55219
 Module Manager is required for DREC to work.
 
-Note: Does not support KSP 0.25 Windows x64 release.
+Note: Does not support any KSP 64 bit versions past, present or future.
 
+
+Deadly Reentry 7.0 for KSP 1.0.*
 A note on settings:
-1. Playing on Stock Kerbin, want traditional DRE functionality: don't change anything.
-2. Playing on Stock Kerbin, want "harder" / hotter reentry (i.e. faking an 8km/sec reentry): set the shockwave exponent and multiplier to taste; I suggest exponent 1.12 to start. You will need heat shields built for RSS. Grab this file:  https://raw.githubusercontent.com/NathanKell/RealismOverhaul/master/RealismOverhaul/RO_DRE.cfg and place it in your DeadlyReentry folder.
-3. Playing on Earth or 10x Kerbin (RSS), want heating to be realistic: don't change anything. Use RSS class heat shields. You can get heatshields configured for RSS, and much more, in the Realism Overhaul release thread: http://forum.kerbalspaceprogram.com/threads/59207
-4. Playing on Earth or 10x Kerbin (RSS), want traditional Kerbin sized-level of heating (aka "easy") set _heat_ multiplier to 12 or so.
-
+Coming Soon
 
 INSTALL INSTRUCTIONS:
 1. If you currently have Deadly Reentry installed, go to KSP/GameData/DeadlyReentry and delete everything (files and folders) except custom.cfg. Also delete any old versions of ModuleManager (modulemanager.dll for example) in your KSP/GameData folder.
@@ -25,6 +23,60 @@ Hold down ALT+D+R to enable debugging. This lets you change settings in-game, an
 
 ==========
 Changelog:
+v7.2.1
+* Removed Modular Flight Integrator dependency
+
+v7.2.0
+* Deadly Reentry no longer implements reentry heating. Instead it tweaks parameters to make stock reentry deadlier.
+* Deadly Reentry still handles G-force damage.
+* Still no menu. (sorry! Cute cat still there!)
+* Configs for all parts previously handled by Deadly Reentry have been edited to take advantage of new stock skin system.
+* Spaceplane handling is a bit experimental and relies on having a skin with VERY low thermal mass which increases the heat loss from radiation. 
+  (use VERY shallow reentries for spaceplanes and reentries will be survivable but difficult. Consider turning off the heat gauges or you will get a frightful scare when you do spaceplane reentries)
+* (no, seriously, turn the heat gauges off...)
+* skinMaxTemp tends to be higher than maxTemp which now represents internal temp, including resource temp.
+* ModularFlightIntegrator is still a dependency but is not currently used by Deadly Reentry.
+
+v7.1.0
+* Added heat shield char support. (not all shields)
+* Major changes to skin conduction, radiation and convection
+* Skin percentage is now actually a percentage of thermal mass. (i.e. part thermal mass goes down as skin thermal mass goes up)
+* Heat shield aerodynamics fixed. (stable when blunt end forwards for all DRE shields & ADEPT shields)
+* Heat shield decoupler: texts fixed. Unused decouplers removed. 0.625m decoupler added.
+* NaN checking
+* MOAR NaN checking
+* Moved away from foreach usage. (you shouldn't use foreach, m'kay? foreach is bad.... m'kay?)
+* Delete audio on destroy
+* reimplemented engine detection
+* RO support
+* Depleted shields burn easier
+* 1kg minimum part mass enforced. (in calculations only; part mass is not touched)
+* Fixed 3.75m shield normal map
+* Patching of KSO parts to remove obsolete pre DRE 7 configs.
+
+
+v7.0.3
+* Calculate what pecentage of skin is actually facing the shockwave and use only that percent for thermalMass
+* Add OnDestroy() and null the FlightIntegrator cache
+* Added additional check for part.ShieldedFromAistream
+* Buffed fuel tank maxTemp
+* Fixed typo in DRE heat shields
+
+v7.0.2
+* Removed legacy engine configurations which were adding pre-KSP 1.0 levels of heat production. (FIRE BAD!)
+* Fixed duplicate toolbar button issue
+* Tweaked convection heating to start EARLIER. Tweaked stock shields to (more or less)
+* Put in checks and guards against null ref errors in UpdateConvection()
+
+v7.0.1
+* Fixed stack bottom attach nodes.
+
+v7.0
+* Deadly Reentry rewritten from the ground up to take advantage of stock thermodynamics.
+* Skin temperature implemented. part.temperature now represents a parts interior  temperature. Skin and part temperatures are tracked separately. Because the skin tends to be thinner it will usually be very much easier to burn through.
+* ModuleHeatShield uses the same format as KSP 1.0's ModuleAblator. The old heat shield format is deprecated and no longer used.
+* Heat shield reflective property is now replaced by the part's emissiveConstant. In theory, subtract the reflective value from 1.0. That is the emissiveConstant. In practice, parts will have a minimum value of 0.4. Values of 0.6 - 0.95 represent fairings and passive heat shields such as space shuttle tiles and other non ablatives.
+
 v6.4
 *Added toolbar button (for stock toolbar)
 *Added Easy, Normal and Hard difficulty settings accessible from new menu

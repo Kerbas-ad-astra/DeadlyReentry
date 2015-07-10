@@ -158,3 +158,5 @@ $RECYCLE.BIN/
 DeadlyReentry/custom.cfg
 *.csproj
 *.zip
+DeadlyReentry.userprefs
+Source/DeadlyReentry.csproj
